@@ -7,17 +7,16 @@
 import Foundation
 class SystemLevelCompatibilityLayer {
     @discardableResult
-    public func sh(_ args: String...) -> Int32 {
+    public func executeShellScript(_ args: String...) -> Int32 {
         let task = Process()
         task.launchPath = "/usr/bin/env"
         task.arguments = args
-        print("Script launched:", args.joined(separator: " "))
         task.launch()
         task.waitUntilExit()
         return task.terminationStatus
     }
     
-    public func isTheFileExist(at: String) -> Bool {
+    public func doesTheFileExist(at: String) -> Bool {
         let fileManager = FileManager.default
         if fileManager.fileExists(atPath: at) {
             return true
@@ -36,7 +35,7 @@ class SystemLevelCompatibilityLayer {
     }
     
     public func readContents(of: String) -> String {
-        if !isTheFileExist(at: of) {
+        if !doesTheFileExist(at: of) {
             return "returned:nofile"
         }else{
             do{
