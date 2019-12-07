@@ -16,6 +16,28 @@ class SystemLevelCompatibilityLayer {
         return task.terminationStatus
     }
     
+    public func executeShellScriptWithRootPrivilages(pass: String, _ args: String) -> Int32 {
+        return pipeCommandline(primaryCommand: "echo#" + pass, execCommands: "sudo#-S#" + args)
+    }
+    
+    public func pipeCommandline(primaryCommand: String, execCommands: String) -> Int32 {
+        let pipe = Pipe()
+        let echo = Process()
+        echo.launchPath = "/usr/bin/env"
+        echo.arguments = primaryCommand.components(separatedBy: "#")
+        echo.standardOutput = pipe
+        let uniq = Process()
+        uniq.launchPath = "/usr/bin/env"
+        uniq.arguments = execCommands.components(separatedBy: "#")
+        uniq.standardInput = pipe
+        let out = Pipe()
+        uniq.standardOutput = out
+        echo.launch()
+        uniq.launch()
+        uniq.waitUntilExit()
+        return uniq.terminationStatus
+    }
+    
     public func doesTheFileExist(at: String) -> Bool {
         let fileManager = FileManager.default
         if fileManager.fileExists(atPath: at) {
@@ -27,6 +49,15 @@ class SystemLevelCompatibilityLayer {
             } else {
                 return false
             }
+        }
+    }
+    
+    public func isFile(at: String) -> Bool {
+        let fileManager = FileManager.default
+        if fileManager.fileExists(atPath: at) {
+            return true
+        } else {
+            return false
         }
     }
     
