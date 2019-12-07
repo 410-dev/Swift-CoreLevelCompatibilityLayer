@@ -16,10 +16,12 @@ class SystemLevelCompatibilityLayer {
         return task.terminationStatus
     }
     
+    @discardableResult
     public func executeShellScriptWithRootPrivilages(pass: String, _ args: String) -> Int32 {
         return pipeCommandline(primaryCommand: "echo#" + pass, execCommands: "sudo#-S#" + args)
     }
     
+    @discardableResult
     public func pipeCommandline(primaryCommand: String, execCommands: String) -> Int32 {
         let pipe = Pipe()
         let echo = Process()
